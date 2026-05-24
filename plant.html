@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydro Bloom – Plant Monitor</title>
+    <link rel="stylesheet" href="main_ui.css">
+    <link rel="stylesheet" href="plant.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght=300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="liquid-shape shape-1"></div>
+        <div class="liquid-shape shape-2"></div>
+
+        <header class="app-header">
+            <div class="logo-title">
+                <i class="ph ph-leaf logo-icon"></i>
+                <h1>Hydro Bloom</h1>
+            </div>
+        </header>
+
+        <main class="content-area plant-content">
+            <div class="avatar-section">
+                <div class="plant-display" id="plantDisplay">
+                    <div class="plant-overlay-top">
+                        <button class="plant-menu-btn">
+                            <i class="ph ph-list"></i>
+                        </button>
+                        <div class="plant-name-badge">
+                            <i class="ph-fill ph-plant"></i>
+                            <span id="plantNameLabel">My_plant_1</span>
+                        </div>
+                    </div>
+                    <img class="plant-gif" id="plantImg" src="../images/happy_nbg.png" alt="plant">
+                </div>
+            </div>
+
+            <div class="alert-banner" id="alertBanner" role="alert" aria-live="assertive">
+                <i class="ph-fill ph-warning"></i>
+                <span id="alertText">Value out of range!</span>
+            </div>
+
+            <div class="sensors-grid" id="sensorsGrid">
+                <!-- PH -->
+                <div class="sensor-tile" id="tile-ph">
+                    <div class="tile-header">
+                        <span class="tile-icon"><i class="ph ph-flask"></i></span>
+                        <span class="tile-title">pH</span>
+                        <span class="tile-value" id="val-ph">—</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-ph"></div>
+                        <div class="bar-marker min-marker" id="minmark-ph"></div>
+                        <div class="bar-marker max-marker" id="maxmark-ph"></div>
+                    </div>
+                    <div class="tile-range">
+                        <span class="range-label min-label">Min <b id="min-ph">—</b></span>
+                        <span class="range-label max-label">Max <b id="max-ph">—</b></span>
+                    </div>
+                    <div class="tile-status" id="status-ph"></div>
+                </div>
+
+                <!-- TDS -->
+                <div class="sensor-tile" id="tile-tds">
+                    <div class="tile-header">
+                        <span class="tile-icon"><i class="ph ph-test-tube"></i></span>
+                        <span class="tile-title">TDS <small>ppm</small></span>
+                        <span class="tile-value" id="val-tds">—</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-tds"></div>
+                        <div class="bar-marker min-marker" id="minmark-tds"></div>
+                        <div class="bar-marker max-marker" id="maxmark-tds"></div>
+                    </div>
+                    <div class="tile-range">
+                        <span class="range-label min-label">Min <b id="min-tds">—</b></span>
+                        <span class="range-label max-label">Max <b id="max-tds">—</b></span>
+                    </div>
+                    <div class="tile-status" id="status-tds"></div>
+                </div>
+
+                <!-- WATER FLOW-->
+                <div class="sensor-tile" id="tile-flow">
+                    <div class="tile-header">
+                        <span class="tile-icon"><i class="ph ph-drop"></i></span>
+                        <span class="tile-title">Water Flow <small>L/m</small></span>
+                        <span class="tile-value" id="val-flow">—</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-flow"></div>
+                        <div class="bar-marker min-marker" id="minmark-flow"></div>
+                        <div class="bar-marker max-marker" id="maxmark-flow"></div>
+                    </div>
+                    <div class="tile-range">
+                        <span class="range-label min-label">Min <b id="min-flow">—</b></span>
+                        <span class="range-label max-label">Max <b id="max-flow">—</b></span>
+                    </div>
+                    <div class="tile-status" id="status-flow"></div>
+                </div>
+
+                <!-- WATER LEVEL  -->
+                <div class="sensor-tile" id="tile-level">
+                    <div class="tile-header">
+                        <span class="tile-icon"><i class="ph ph-gauge"></i></span>
+                        <span class="tile-title">Water Level <small>%</small></span>
+                        <span class="tile-value" id="val-level">—</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-level"></div>
+                        <div class="bar-marker min-marker" id="minmark-level"></div>
+                        <div class="bar-marker max-marker" id="maxmark-level"></div>
+                    </div>
+                    <div class="tile-range">
+                        <span class="range-label min-label">Min <b id="min-level">—</b></span>
+                        <span class="range-label max-label">Max <b id="max-level">—</b></span>
+                    </div>
+                    <div class="tile-status" id="status-level"></div>
+                </div>
+
+                <!-- TEMP -->
+                <div class="sensor-tile" id="tile-temp">
+                    <div class="tile-header">
+                        <span class="tile-icon"><i class="ph ph-thermometer"></i></span>
+                        <span class="tile-title">Temperature <small>°C</small></span>
+                        <span class="tile-value" id="val-temp">—</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-temp"></div>
+                        <div class="bar-marker min-marker" id="minmark-temp"></div>
+                        <div class="bar-marker max-marker" id="maxmark-temp"></div>
+                    </div>
+                    <div class="tile-range">
+                        <span class="range-label min-label">Min <b id="min-temp">—</b></span>
+                        <span class="range-label max-label">Max <b id="max-temp">—</b></span>
+                    </div>
+                    <div class="tile-status" id="status-temp"></div>
+                </div>
+
+                <!-- OXYGEN -->
+                <div class="sensor-tile" id="tile-oxygen">
+                    <div class="tile-header">
+                        <span class="tile-icon"><i class="ph ph-wind"></i></span>
+                        <span class="tile-title">Oxygen <small>mg/L</small></span>
+                        <span class="tile-value" id="val-oxygen">—</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" id="bar-oxygen"></div>
+                        <div class="bar-marker min-marker" id="minmark-oxygen"></div>
+                        <div class="bar-marker max-marker" id="maxmark-oxygen"></div>
+                    </div>
+                    <div class="tile-range">
+                        <span class="range-label min-label">Min <b id="min-oxygen">—</b></span>
+                        <span class="range-label max-label">Max <b id="max-oxygen">—</b></span>
+                    </div>
+                    <div class="tile-status" id="status-oxygen"></div>
+                </div>
+            </div>
+
+            <button class="add-plant-btn" id="openAddPlantForm" aria-label="action" onclick="window.location.href='main_ui.html'">
+                <i class="ph-bold ph-plus-circle"></i>
+                <span>New plant</span>
+            </button>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item" aria-label="action" onclick="window.location.href='actions.html'">
+                <i class="ph ph-power"></i>
+            </button>
+            <button class="nav-item active" aria-label="Home" onclick="window.location.href='plant.html'">
+                <i class="ph-fill ph-house"></i>
+            </button>
+            <button class="nav-item" aria-label="Account" onclick="window.location.href='account.html'">
+                <i class="ph ph-user"></i>
+            </button>
+        </nav>
+    </div>
+</body>
+<script src="plant.js"></script>
+</html>

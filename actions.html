@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydro Bloom - Actions</title>
+    <link rel="stylesheet" href="main_ui.css">
+    <link rel="stylesheet" href="actions.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="liquid-shape shape-1"></div>
+        <div class="liquid-shape shape-2"></div>
+
+        <header class="app-header">
+            <div class="logo-title">
+                <i class="ph ph-leaf logo-icon"></i>
+                <h1>Hydro Bloom</h1>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <p class="page-subtitle">System Control</p>
+
+            <div class="actions-section">
+                <div class="section-header">
+                    <i class="ph-fill ph-gauge"></i>
+                    <span>Manual Controls</span>
+                </div>
+
+                <div class="action-card glass-panel">
+                    <div class="action-left">
+                        <div class="action-icon-box" style="background: rgba(255, 119, 119, 0.18); color: #990000;">
+                            <i class="ph-fill ph-gear"></i>
+                        </div>
+                        <div class="action-info">
+                            <span class="action-name">System Power</span>
+                            <span class="action-desc">Turn the system power supply on/off</span>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="lightToggle">
+                        <span class="toggle-track"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="actions-section">
+                <div class="section-header">
+                    <i class="ph ph-clock-countdown"></i>
+                    <span>Coming Soon</span>
+                </div>
+
+                <div class="action-card glass-panel wip-card">
+                    <div class="action-left">
+                        <div class="action-icon-box wip-icon">
+                            <i class="ph ph-clock"></i>
+                        </div>
+                        <div class="action-info">
+                            <span class="action-name">Water Pump</span>
+                            <span class="action-desc">Schedule pump delay</span>
+                        </div>
+                    </div>
+                    <div class="wip-badge">
+                        <i class="ph ph-clock"></i> In Dev
+                    </div>
+                </div>
+
+                <div class="action-card glass-panel wip-card">
+                    <div class="action-left">
+                        <div class="action-icon-box wip-icon">
+                            <i class="ph ph-clock"></i>
+                        </div>
+                        <div class="action-info">
+                            <span class="action-name">pH Pump</span>
+                            <span class="action-desc">Auto pH correction</span>
+                        </div>
+                    </div>
+                    <div class="wip-badge">
+                        <i class="ph ph-clock"></i> In Dev
+                    </div>
+                </div>
+
+                <div class="action-card glass-panel wip-card">
+                    <div class="action-left">
+                        <div class="action-icon-box wip-icon">
+                            <i class="ph ph-clock"></i>
+                        </div>
+                        <div class="action-info">
+                            <span class="action-name">Nutrient Pump</span>
+                            <span class="action-desc">Inject nutrients</span>
+                        </div>
+                    </div>
+                    <div class="wip-badge">
+                        <i class="ph ph-clock"></i> In Dev
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" aria-label="Actions" onclick="window.location.href='actions.html'">
+                <i class="ph-fill ph-power"></i>
+            </button>
+            <button class="nav-item" aria-label="Home" onclick="window.location.href='plant.html'">
+                <i class="ph ph-house"></i>
+            </button>
+            <button class="nav-item" aria-label="Account" onclick="window.location.href='account.html'">
+                <i class="ph ph-user"></i>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        const FIREBASE_URL = 'https://asma-6cc27-default-rtdb.europe-west1.firebasedatabase.app/power.json'; 
+        const powerToggle = document.getElementById('lightToggle');
+        const powerCard = powerToggle.closest('.action-card');
+
+        function updateCardUI(isActive) {
+            if (isActive) {
+                powerCard.classList.add('card-active');
+            } else {
+                powerCard.classList.remove('card-active');
+            }
+        }
+
+        async function fetchInitialStatus() {
+            try {
+                const response = await fetch(FIREBASE_URL);
+                if (!response.ok) throw new Error('Database response error');
+                
+                const data = await response.json();
+                const isOn = (data === "on");
+                
+                powerToggle.checked = isOn;
+                updateCardUI(isOn);
+            } catch (error) {
+                console.error("Failed to load initial status from Firebase:", error);
+            }
+        }
+
+        powerToggle.addEventListener('change', async function () {
+            const stateString = this.checked ? "on" : "off";
+            updateCardUI(this.checked);
+
+            try {
+                const response = await fetch(FIREBASE_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(stateString)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Database update failed');
+                }
+                console.log(`Firebase successfully updated to: ${stateString}`);
+            } catch (error) {
+                console.error("Failed to push update to Firebase:", error);
+                this.checked = !this.checked;
+                updateCardUI(this.checked);
+                alert("Could not update remote system power. Please check connection.");
+            }
+        });
+
+        fetchInitialStatus();
+    </script>
+</body>
+</html>

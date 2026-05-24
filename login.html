@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydro Bloom - Login</title>
+    <link rel="stylesheet" href="main_ui.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .auth-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            padding-top: 40px;
+            position: relative;
+        }
+        .auth-header {
+            text-align: center;
+        }
+        .auth-header i {
+            font-size: 60px;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+        }
+        .auth-logo {
+            width: 450px;
+            height: 450px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 6px 18px rgba(102,187,106,0.35));
+        }
+        .auth-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .auth-header p {
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+        .auth-footer a {
+            color: var(--primary-dark);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        #alertContainer {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: calc(100% - 40px);
+            max-width: 400px;
+            pointer-events: none;
+        }
+        .custom-alert {
+            pointer-events: auto;
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 4px solid #e53935;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .custom-alert i {
+            position: relative;
+            top: -1px;
+            font-size: 18px;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="alertContainer"></div>
+
+    <div class="mobile-container">
+        <div class="liquid-shape shape-1"></div>
+        <div class="liquid-shape shape-2"></div>
+        
+        <main class="content-area">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <img src="../images/logo1.png" alt="Hydro Bloom Logo" style="width: 60%;">
+                    <br>
+                    <h2>Welcome Back</h2>
+                    <p>Grow your hydroponic garden with ease</p>
+                </div>
+
+                <form class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="hello@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" id="submitBtn" class="submit-plant-btn" style="margin-top: 10px;">Log In</button>
+                </form>
+
+                <div class="auth-footer">
+                    Don't have an account? <a href="index.html">Sign Up</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const FIREBASE_USERS_URL = 'https://asma-6cc27-default-rtdb.europe-west1.firebasedatabase.app/users.json';
+
+        function showCustomAlert(message) {
+            const container = document.getElementById('alertContainer');
+            container.innerHTML = `
+                <div class="custom-alert">
+                    <i class="ph-bold ph-warning-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+
+        function clearCustomAlert() {
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            clearCustomAlert();
+
+            const emailInput = document.getElementById('email').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Logging In...";
+
+            try {
+                const response = await fetch(FIREBASE_USERS_URL);
+                if (!response.ok) throw new Error('Database connection failed.');
+
+                const usersData = await response.json();
+                let isAuthenticated = false;
+
+                if (usersData && typeof usersData === 'object') {
+                    isAuthenticated = Object.values(usersData).some(user => 
+                        user && 
+                        user.email && String(user.email).toLowerCase() === emailInput && 
+                        user.password && String(user.password) === passwordInput
+                    );
+                }
+
+                if (isAuthenticated) {
+                    window.location.href = 'main_ui.html';
+                } else {
+                    showCustomAlert('Invalid email or password. Please try again.');
+                    resetSubmitButton(submitBtn);
+                }
+
+            } catch (error) {
+                console.error("Login error details:", error);
+                showCustomAlert('An error occurred during log-in: ' + error.message);
+                resetSubmitButton(submitBtn);
+            }
+        });
+
+        function resetSubmitButton(btn) {
+            btn.disabled = false;
+            btn.textContent = "Log In";
+        }
+    </script>
+</body>
+</html>

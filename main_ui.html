@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydro Bloom</title>
+    <link rel="stylesheet" href="main_ui.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        .add-plant-form-card {
+            max-height: 85vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 187, 106, 0.3) transparent;
+        }
+        .add-plant-form-card::-webkit-scrollbar {
+            width: 4px;
+        }
+        .add-plant-form-card::-webkit-scrollbar-thumb {
+            background: rgba(102, 187, 106, 0.35);
+            border-radius: 4px;
+        }
+        .mode-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: transparent;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .mode-btn.active {
+            background: white;
+            color: var(--primary-dark);
+            box-shadow: 0 3px 10px rgba(102, 187, 106, 0.2);
+        }
+        .mode-btn i {
+            font-size: 16px;
+        }
+        .sensors-section {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .sensor-card {
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 18px;
+            padding: 14px 16px;
+            transition: box-shadow 0.2s;
+        }
+        .sensor-card:focus-within {
+            box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.18);
+        }
+        .sensor-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .sensor-label i {
+            font-size: 17px;
+        }
+        .sensor-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .sensor-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .sensor-field label {
+            font-size: 11.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sensor-field input {
+            padding: 10px 13px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.6);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .sensor-field input:focus {
+            background: white;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.15);
+        }
+        .sensor-field input:disabled {
+            background: rgba(226, 243, 230, 0.6);
+            color: var(--text-muted);
+            border-color: rgba(200, 230, 201, 0.5);
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+        .sensor-card.locked {
+            opacity: 0.82;
+        }
+        .sensor-card.locked .sensor-label {
+            color: var(--text-muted);
+        }
+        .default-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--primary-dark);
+            background: rgba(102, 187, 106, 0.15);
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper input {
+            padding-right: 36px;
+        }
+        .unit-hint {
+            position: absolute;
+            right: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 2px;
+        }
+        .form-divider {
+            height: 1px;
+            background: rgba(102, 187, 106, 0.15);
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="liquid-shape shape-1"></div>
+        <div class="liquid-shape shape-2"></div>
+        <header class="app-header">
+            <div class="logo-title">
+                <i class="ph ph-leaf logo-icon"></i>
+                <h1>Hydro Bloom</h1>
+            </div>
+        </header>
+        <main class="content-area">
+            <div class="avatar-section">
+                <div class="plant-display">
+                    <img class="plant-gif" src="../images/confused_nbg.png" alt="plant">
+                    <div class="confused-marks">
+                        <span class="mark m1">?</span>
+                        <span class="mark m2">?</span>
+                        <span class="mark m3">?</span>
+                    </div>
+                </div>
+            </div>
+            <button class="add-plant-btn" id="openAddPlantForm">
+                <i class="ph-bold ph-plus-circle"></i>
+                <span>Add a new plant</span>
+            </button>
+        </main>
+        <nav class="bottom-nav">
+            <button class="nav-item" aria-label="action" onclick="window.location.href='actions.html'">
+                <i class="ph ph-power"></i>
+            </button>
+            <button class="nav-item active" aria-label="Home" onclick="window.location.href=''">
+                <i class="ph-fill ph-house"></i>
+            </button>
+            <button class="nav-item" aria-label="Account" onclick="window.location.href='account.html'">
+                <i class="ph ph-user"></i>
+            </button>
+        </nav>
+        <div class="add-plant-overlay" id="addPlantOverlay">
+            <div class="add-plant-form-card glass-panel">
+                <div class="form-header">
+                    <h2>New Plant</h2>
+                    <button class="close-form-btn" id="closeAddPlantForm" aria-label="Close">
+                        <i class="ph ph-x"></i>
+                    </button>
+                </div>
+                <form class="plant-form" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="plantName">Plant Name</label>
+                        <input type="text" id="plantName" placeholder="e.g. My_plant_1" required>
+                    </div>
+                    <div class="form-divider"></div>
+                    <div class="form-group">
+                        <label class="section-title">Sensor Values</label>
+                        <div class="mode-toggle">
+                            <button type="button" class="mode-btn active" id="btnDefault">
+                                <i class="ph ph-lock-simple"></i> Default
+                            </button>
+                            <button type="button" class="mode-btn" id="btnCustom">
+                                <i class="ph ph-sliders"></i> Customized
+                            </button>
+                        </div>
+                    </div>
+                    <div class="sensors-section" id="sensorsSection">
+                        <div class="sensor-card locked" data-sensor="ph">
+                            <div class="sensor-label">
+                                <i class="ph ph-flask"></i> pH Sensor
+                                <span class="default-badge"><i class="ph ph-check-circle"></i> default</span>
+                            </div>
+                            <div class="sensor-inputs">
+                                <div class="sensor-field">
+                                    <label>Min</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.1" value="5.5" disabled>
+                                        <span class="unit-hint">pH</span>
+                                    </div>
+                                </div>
+                                <div class="sensor-field">
+                                    <label>Max</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.1" value="6.5" disabled>
+                                        <span class="unit-hint">pH</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sensor-card locked" data-sensor="tds">
+                            <div class="sensor-label">
+                                <i class="ph ph-test-tube"></i> TDS Sensor
+                                <span class="default-badge"><i class="ph ph-check-circle"></i> default</span>
+                            </div>
+                            <div class="sensor-inputs">
+                                <div class="sensor-field">
+                                    <label>Min</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="10" value="500" disabled>
+                                        <span class="unit-hint">ppm</span>
+                                    </div>
+                                </div>
+                                <div class="sensor-field">
+                                    <label>Max</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="10" value="1000" disabled>
+                                        <span class="unit-hint">ppm</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sensor-card locked" data-sensor="flow">
+                            <div class="sensor-label">
+                                <i class="ph ph-drop"></i> Water Flow
+                                <span class="default-badge"><i class="ph ph-check-circle"></i> default</span>
+                            </div>
+                            <div class="sensor-inputs">
+                                <div class="sensor-field">
+                                    <label>Min</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.1" value="1.0" disabled>
+                                        <span class="unit-hint">L/m</span>
+                                    </div>
+                                </div>
+                                <div class="sensor-field">
+                                    <label>Max</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.1" value="3.0" disabled>
+                                        <span class="unit-hint">L/m</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sensor-card locked" data-sensor="level">
+                            <div class="sensor-label">
+                                <i class="ph ph-gauge"></i> Water Level
+                                <span class="default-badge"><i class="ph ph-check-circle"></i> default</span>
+                            </div>
+                            <div class="sensor-inputs">
+                                <div class="sensor-field">
+                                    <label>Min</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="1" value="20" disabled>
+                                        <span class="unit-hint">%</span>
+                                    </div>
+                                </div>
+                                <div class="sensor-field">
+                                    <label>Max</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="1" value="90" disabled>
+                                        <span class="unit-hint">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sensor-card locked" data-sensor="temp">
+                            <div class="sensor-label">
+                                <i class="ph ph-thermometer"></i> Temperature
+                                <span class="default-badge"><i class="ph ph-check-circle"></i> default</span>
+                            </div>
+                            <div class="sensor-inputs">
+                                <div class="sensor-field">
+                                    <label>Min</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.5" value="18" disabled>
+                                        <span class="unit-hint">°C</span>
+                                    </div>
+                                </div>
+                                <div class="sensor-field">
+                                    <label>Max</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.5" value="24" disabled>
+                                        <span class="unit-hint">°C</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sensor-card locked" data-sensor="o2">
+                            <div class="sensor-label">
+                                <i class="ph ph-wind"></i>  Oxygen
+                                <span class="default-badge"><i class="ph ph-check-circle"></i> default</span>
+                            </div>
+                            <div class="sensor-inputs">
+                                <div class="sensor-field">
+                                    <label>Min</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.1" value="6.0" disabled>
+                                        <span class="unit-hint">mg/L</span>
+                                    </div>
+                                </div>
+                                <div class="sensor-field">
+                                    <label>Max</label>
+                                    <div class="input-wrapper">
+                                        <input type="number" step="0.1" value="10.0" disabled>
+                                        <span class="unit-hint">mg/L</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="submit-plant-btn">Add Plant</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="main_ui.js"></script>
+</body>
+</html>

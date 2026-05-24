@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydro Bloom - Account</title>
+    <link rel="stylesheet" href="main_ui.css">
+    <link rel="stylesheet" href="account.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="liquid-shape shape-1"></div>
+        <div class="liquid-shape shape-2"></div>
+        
+        <header class="app-header">
+            <div class="logo-title">
+                <i class="ph ph-leaf logo-icon"></i>
+                <h1>Hydro Bloom</h1>
+            </div>
+        </header>
+
+        <main class="content-area">
+
+            <!-- Profile -->
+            <div class="profile-section">
+                <div class="profile-avatar-container" id="dropZone">
+                    <div class="profile-avatar" id="profileAvatar">
+                        <i class="ph ph-user-circle"></i>
+                    </div>
+                    <div class="drop-hint">Tap to change photo</div>
+                    <input type="file" id="fileInput" hidden accept="image/*">
+                </div>
+
+                <br><br>
+
+                <div class="profile-info">
+        <h2 id="userName" contenteditable="true" spellcheck="false" title="Click to edit">User Name</h2>                
+            <p class="bio">A hydroponic expert   🌱</p>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="settings-list">
+
+                <div class="settings-item glass-panel">
+                    <div class="settings-label">
+                        <div class="icon-box" style="background: rgba(102, 187, 106, 0.18); color: #43a047;">
+                            <i class="ph-fill ph-bell"></i>
+                        </div>
+                        <span>Notifications</span>
+                    </div>
+                    <i class="ph ph-caret-right"></i>
+                </div>
+
+                <div class="settings-item glass-panel">
+                    <div class="settings-label">
+                        <div class="icon-box" style="background: rgba(102, 187, 106, 0.18); color: #43a047;">
+                            <i class="ph-fill ph-shield-check"></i>
+                        </div>
+                        <span>Privacy &amp; Security</span>
+                    </div>
+                    <i class="ph ph-caret-right"></i>
+                </div>
+
+                <div class="settings-item glass-panel">
+                    <div class="settings-label">
+                        <div class="icon-box" style="background: rgba(102, 187, 106, 0.18); color: #43a047;">
+                            <i class="ph-fill ph-question"></i>
+                        </div>
+                        <span>Help Center</span>
+                    </div>
+                    <i class="ph ph-caret-right"></i>
+                </div>
+
+            </div>
+
+            <button class="logout-btn" onclick="window.location.href='login.html'">
+                <i class="ph ph-sign-out"></i>
+                <span>Log Out</span>
+            </button>
+
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item" aria-label="action" onclick="window.location.href='actions.html'">
+                <i class="ph ph-power"></i>
+            </button>
+            <button class="nav-item" aria-label="Home" onclick="window.location.href='plant.html'">
+                <i class="ph ph-house"></i>
+            </button>
+            <button class="nav-item active" aria-label="Account" onclick="window.location.href='account.html'">
+                <i class="ph-fill ph-user"></i>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const profileAvatar = document.getElementById('profileAvatar');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+        function handleFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    profileAvatar.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>

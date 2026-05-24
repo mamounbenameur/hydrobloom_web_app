@@ -1,0 +1,181 @@
+
+.page-subtitle {
+    width: 90%;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: -30px;
+    margin-top: -10px;
+}
+
+.actions-section {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin-bottom: 2px;
+    padding-left: 4px;
+}
+
+.section-header i {
+    font-size: 18px;
+}
+
+.action-card {
+    border-radius: 22px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(102, 187, 106, 0.18);
+}
+
+.action-card.card-active {
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 8px 24px rgba(102, 187, 106, 0.22);
+}
+
+.action-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.action-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.action-card:hover .action-icon-box {
+    transform: scale(1.08);
+}
+
+.action-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.action-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.action-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 52px;
+    height: 29px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-track {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+    transition: background 0.3s ease;
+}
+
+.toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    top: 3.5px;
+    left: 4px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+
+.toggle-switch input:checked + .toggle-track {
+    background: var(--primary-color);
+}
+
+.toggle-switch input:checked + .toggle-track::after {
+    transform: translateX(23px);
+    box-shadow: 0 2px 8px rgba(102, 187, 106, 0.4);
+}
+
+/* l Coming Soon */
+.wip-card {
+    opacity: 0.72;
+    cursor: default;
+    pointer-events: none;
+}
+
+.wip-card:hover {
+    transform: none;
+    box-shadow: var(--glass-shadow);
+}
+
+.wip-icon {
+    background: rgba(150, 150, 150, 0.12) !important;
+    color: var(--text-muted) !important;
+    font-size: 24px;
+}
+
+.wip-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: rgba(150, 150, 150, 0.12);
+    border: 1px solid rgba(150, 150, 150, 0.2);
+    padding: 5px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.wip-badge i {
+    font-size: 14px;
+    animation: tickTock 2s ease-in-out infinite;
+}
+
+@keyframes tickTock {
+    0%   { transform: rotate(0deg);   }
+    25%  { transform: rotate(12deg);  }
+    75%  { transform: rotate(-12deg); }
+    100% { transform: rotate(0deg);   }
+}
