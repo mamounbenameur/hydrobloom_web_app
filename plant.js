@@ -26,7 +26,7 @@ function loadPlantData() {
                     s.now = (s.min + s.max) / 2;
                 }
                 if (!parsed.sensors?.oxygene) {
-                    parsed.sensors.oxygene = { min: 6, max: 14, now: 8 };
+                    parsed.sensors.oxygene = { min: 2, max: 8, now: 3 };
                 }
             });
             return parsed;
