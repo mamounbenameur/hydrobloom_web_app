@@ -15,7 +15,6 @@ function loadPlantData() {
         if (raw) {
             const parsed = JSON.parse(raw);
 
-            // Migrate old 'ec' key to 'tds' if present
             if (parsed.sensors?.ec && !parsed.sensors?.tds) {
                 parsed.sensors.tds = { min: 500, max: 1000, now: 750 };
                 delete parsed.sensors.ec;
@@ -26,7 +25,6 @@ function loadPlantData() {
                 if (s && s.now === undefined) {
                     s.now = (s.min + s.max) / 2;
                 }
-                // Ensure oxygene exists even in older saved data
                 if (!parsed.sensors?.oxygene) {
                     parsed.sensors.oxygene = { min: 6, max: 14, now: 8 };
                 }
