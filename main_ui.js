@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-
   document.getElementById('openAddPlantForm').addEventListener('click', () => {
     document.getElementById('addPlantOverlay').classList.add('active');
   });
-
   document.getElementById('closeAddPlantForm').addEventListener('click', () => {
     document.getElementById('addPlantOverlay').classList.remove('active');
   });
@@ -14,14 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setMode(mode) {
     const isDefault = mode === 'default';
-
     btnDefault.classList.toggle('active',  isDefault);
     btnCustom .classList.toggle('active', !isDefault);
-
     cards.forEach(card => {
       const inputs = card.querySelectorAll('input');
       const badge  = card.querySelector('.default-badge');
-
       if (isDefault) {
         card.classList.add('locked');
         badge.style.display = 'inline-flex';
@@ -38,12 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
   btnCustom .addEventListener('click', () => setMode('custom'));
 
   const DEFAULTS = {
-    ph:    { min: 5.5,  max: 6.5   },
-    tds:   { min: 500,  max: 1000  },
-    flow:  { min: 1.0,  max: 3.0   },
-    level: { min: 20,   max: 90    },
-    temp:  { min: 18.0, max: 24.0  },
-    o2:    { min: 2.0,  max: 8.0  },
+    ph:      { min: 5.5,  max: 6.5  },
+    tds:     { min: 500,  max: 1000 },
+    flow:    { min: 1.0,  max: 3.0  },
+    level:   { min: 20,   max: 90   },
+    temp:    { min: 18.0, max: 24.0 },
+    oxygene: { min: 2.0,  max: 8.0  },  
   };
 
   function collectSensorData() {
@@ -74,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('.submit-plant-btn').addEventListener('click', () => {
     const plantName = document.getElementById('plantName').value.trim();
-
     if (!plantName) {
       alert('Please enter a plant name.');
       return;
@@ -88,6 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+
+    Object.keys(sensors).forEach(key => {
+      sensors[key].now = (sensors[key].min + sensors[key].max) / 2;
+    });
+
     const plantData = {
       name:      plantName,
       createdAt: new Date().toISOString(),
@@ -96,8 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     localStorage.setItem('hydrobloom_plant', JSON.stringify(plantData));
-
     window.location.href = 'plant.html';
   });
-
 });
