@@ -1,10 +1,10 @@
 const SENSOR_META = {
-    ph:     { label: 'pH',          absMin: 0,    absMax: 14,   unit: 'pH',   decimals: 1 },
-    tds:    { label: 'TDS',         absMin: 0,    absMax: 2000, unit: 'ppm',  decimals: 0 },
-    flow:   { label: 'Water Flow',  absMin: 0,    absMax: 10,   unit: 'L/m',  decimals: 1 },
-    level:  { label: 'Water Level', absMin: 0,    absMax: 100,  unit: '%',    decimals: 0 },
-    temp:   { label: 'Temperature', absMin: 0,    absMax: 50,   unit: '°C',   decimals: 1 },
-    oxygene: { label: 'oxygene',      absMin: 0,    absMax: 20,   unit: 'mg/L', decimals: 1 },
+    ph:      { label: 'pH',          absMin: 0,  absMax: 14,   unit: 'pH',   decimals: 1 },
+    tds:     { label: 'TDS',         absMin: 0,  absMax: 2000, unit: 'ppm',  decimals: 0 },
+    flow:    { label: 'Water Flow',  absMin: 0,  absMax: 10,   unit: 'L/m',  decimals: 1 },
+    level:   { label: 'Water Level', absMin: 0,  absMax: 100,  unit: '%',    decimals: 0 },
+    temp:    { label: 'Temperature', absMin: 0,  absMax: 50,   unit: '°C',   decimals: 1 },
+    oxygene: { label: 'Oxygen',      absMin: 0,  absMax: 20,   unit: 'mg/L', decimals: 1 },
 };
 
 const FIREBASE_URL = 'https://asma-6cc27-default-rtdb.europe-west1.firebasedatabase.app/data.json';
@@ -20,15 +20,22 @@ function loadPlantData() {
                 delete parsed.sensors.ec;
             }
 
+            if (parsed.sensors?.o2 && !parsed.sensors?.oxygene) {
+                parsed.sensors.oxygene = parsed.sensors.o2;
+                delete parsed.sensors.o2;
+            }
+
+            if (!parsed.sensors?.oxygene) {
+                parsed.sensors.oxygene = { min: 2, max: 8, now: 5 };
+            }
+
             Object.keys(SENSOR_META).forEach(key => {
                 const s = parsed.sensors?.[key];
                 if (s && s.now === undefined) {
                     s.now = (s.min + s.max) / 2;
                 }
-                if (!parsed.sensors?.oxygene) {
-                    parsed.sensors.oxygene = { min: 2, max: 8, now: 3 };
-                }
             });
+
             return parsed;
         }
     } catch (_) {}
@@ -36,12 +43,12 @@ function loadPlantData() {
     return {
         name: 'My_plant_1',
         sensors: {
-            ph:     { min: 5.5, max: 6.5,  now: 6    },
-            tds:    { min: 500, max: 1000,  now: 750  },
-            flow:   { min: 1.0, max: 3.0,   now: 1.2  },
-            level:  { min: 20,  max: 90,    now: 55   },
-            temp:   { min: 18,  max: 24,    now: 22   },
-            oxygene: { min: 2,   max: 8,    now: 6    },
+            ph:      { min: 5.5, max: 6.5,  now: 6.0 },
+            tds:     { min: 500, max: 1000,  now: 750 },
+            flow:    { min: 1.0, max: 3.0,   now: 1.2 },
+            level:   { min: 20,  max: 90,    now: 55  },
+            temp:    { min: 18,  max: 24,    now: 22  },
+            oxygene: { min: 2,   max: 8,     now: 5   },
         }
     };
 }
@@ -53,12 +60,12 @@ async function fetchNowValues() {
     if (!d) return {};
 
     return {
-        ph:     d.ph     ?? d.PH     ?? d.pH           ?? null,
-        tds:    d.tds    ?? d.TDS    ?? d.ec            ?? d.EC ?? null,
-        flow:   d.flow   ?? d.FLOW   ?? d.waterFlow     ?? null,
-        level:  d.level  ?? d.LEVEL  ?? d.waterLevel    ?? null,
-        temp:   d.temp   ?? d.TEMP   ?? d.temperature   ?? null,
-        oxygene: d.oxygene ?? d.oxygene ?? d.dissolvedO2   ?? null,
+        ph:      d.ph      ?? d.PH      ?? d.pH          ?? null,
+        tds:     d.tds     ?? d.TDS     ?? d.ec           ?? d.EC          ?? null,
+        flow:    d.flow    ?? d.FLOW    ?? d.waterFlow    ?? null,
+        level:   d.level   ?? d.LEVEL   ?? d.waterLevel   ?? null,
+        temp:    d.temp    ?? d.TEMP    ?? d.temperature  ?? null,
+        oxygene: d.oxygene ?? d.OXYGENE ?? d.dissolvedO2  ?? d.O2          ?? null,  
     };
 }
 
@@ -105,11 +112,13 @@ function renderSensor(key, data) {
         : `<i class="ph-fill ph-check-circle"></i> Normal`;
 
     tile.classList.toggle('alert-tile', isAlert);
+
     return { key, isAlert, isLow, isHigh, label: meta.label, now: fmtNow, unit, min: fmtMin, max: fmtMax };
 }
 
 function triggerAlert(alerts) {
     if (!alerts.length) return;
+
     alertText.textContent = alerts
         .map(a => {
             const dir = a.isLow
@@ -124,7 +133,7 @@ function triggerAlert(alerts) {
     plantImg.classList.add('stressed');
 
     clearTimeout(alertTimer);
-    alertTimer = setTimeout(hideAlert2, 6000);
+    alertTimer = setTimeout(hideAlertBannerOnly, 6000);
 }
 
 function hideAlert() {
@@ -133,7 +142,7 @@ function hideAlert() {
     plantImg.classList.remove('stressed');
 }
 
-function hideAlert2() {
+function hideAlertBannerOnly() {
     alertBanner.classList.remove('visible');
 }
 
@@ -147,8 +156,12 @@ function renderAll(plantData) {
         const sensor = plantData.sensors[key];
         if (!sensor) return;
         const result = renderSensor(key, sensor);
-        if (result.isAlert) { newAlerts.push(result); activeAlerts.add(key); }
-        else                { activeAlerts.delete(key); }
+        if (result.isAlert) {
+            newAlerts.push(result);
+            activeAlerts.add(key);
+        } else {
+            activeAlerts.delete(key);
+        }
     });
 
     const hasNew = newAlerts.some(a => !prevAlertKeys.has(a.key));
