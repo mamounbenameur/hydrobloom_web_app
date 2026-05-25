@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     flow:  { min: 1.0,  max: 3.0   },
     level: { min: 20,   max: 90    },
     temp:  { min: 18.0, max: 24.0  },
-    o2:    { min: 6.0,  max: 10.0  },
+    o2:    { min: 2.0,  max: 8.0  },
   };
 
   function collectSensorData() {
